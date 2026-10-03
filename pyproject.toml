@@ -1,0 +1,37 @@
+[project]
+name = "decorative-parts"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "desman", email = "root@nassee.local" }
+]
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+decorative-parts = "decorative_parts:info"
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "pytest-html",
+]
+
+[tool.pytest]
+junit_suite_name = "decorative-parts"
+addopts = [
+    "-rA",
+    "--cov-report=html:report/coverage_html",
+    "--cov=decorative_parts",
+    "--junit-xml=report/junit-report.xml",
+    "--html=report/report.html",
+    "--self-contained-html"
+]
+log_cli = true
+testpaths = ["tests"]
