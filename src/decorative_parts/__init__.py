@@ -1,12 +1,9 @@
-import logging
-
 from decorative_parts.timed_execution import timed
 
 __all__ = [
     'timed',
     'info'
 ]
-
 
 info_dump = """### Decorators:
     @timed
@@ -33,6 +30,7 @@ info_dump = """### Decorators:
     Writes to logs before and after the function'[s execution and on errors
     Takes the following keyword arguments:
     """
+
 
 def info() -> None:
     print(info_dump)

@@ -1,5 +1,6 @@
 """Decorator for timing execution of functions"""
 import functools
+import inspect
 from time import perf_counter_ns
 from typing import Any, Callable
 
@@ -10,7 +11,7 @@ def _printout(**kwargs) -> None:
     print(message.format(**kwargs))
 
 
-def timed(function = None, /, *, logger_func: Callable[..., Any] = _printout,
+def timed(function=None, /, *, logger_func: Callable[..., Any] = _printout,
           message_template: str = "Function: {func_name} runtime {diff} nanoseconds",
           **decorator_args) -> Callable[..., Callable[..., Any]]:
     """Timed execution decorator
@@ -20,9 +21,21 @@ def timed(function = None, /, *, logger_func: Callable[..., Any] = _printout,
     :param decorator_args: additional arguments to be passed to the callback function
     :return: decorated function
     """
+
     def outer(func):
         @functools.wraps(func)
-        def inside(*args, **kwargs):
+        async def inside_async(*args, **kwargs):
+            func_name = func.__name__
+            start = perf_counter_ns()
+            res = await func(*args, **kwargs)
+            end = perf_counter_ns()
+            diff = end - start
+            logger_func(msg=message_template, func_name=func_name, start=start, end=end, diff=diff,
+                        extra=decorator_args)
+            return res
+
+        @functools.wraps(func)
+        def inside_sync(*args, **kwargs):
             func_name = func.__name__
             start = perf_counter_ns()
             res = func(*args, **kwargs)
@@ -31,7 +44,11 @@ def timed(function = None, /, *, logger_func: Callable[..., Any] = _printout,
             logger_func(msg=message_template, func_name=func_name, start=start, end=end, diff=diff,
                         extra=decorator_args)
             return res
-        return inside
+
+        if inspect.iscoroutinefunction(func):
+            return inside_async
+        else:
+            return inside_sync
 
     if callable(function):
         return outer(function)

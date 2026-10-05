@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from decorative_parts import timed
+from decorative_parts.timed_execution import timed
 
 _DEBUG = False
 
@@ -54,20 +54,21 @@ class _DataCollector:
         return f"{nanos_s}.{self.diff - nanos_s}s"
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize('iterations, test_message', _test_data)
-def test_timed_annotation_with_parameters(iterations: int, test_message: str) -> None:
+async def test_timed_annotation_with_parameters(iterations: int, test_message: str) -> None:
     """Tests the basic functionality and parameter passing of @timed with custom logger."""
 
     collector = _DataCollector()
 
     # Use the collector's method as the logger function, passing all necessary metrics.
     @timed(logger_func=collector.log_capture, message_template="{message}", message=test_message)
-    def a_func(repetitions: int):
+    async def a_func(repetitions: int):
         acc: int = 0
         for i in range(repetitions):
             acc = acc + i if i % 2 == 0 else acc - int(i / 2)
 
-    a_func(iterations)
+    await a_func(iterations)
 
     # Assertions check that the decorated function was called and correctly logged metrics.
     assert collector.msg == test_message
@@ -77,21 +78,22 @@ def test_timed_annotation_with_parameters(iterations: int, test_message: str) ->
     assert collector.diff > 0
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize('iterations,test_message', _test_data)
-def test_timed_annotation(capsys, caplog, iterations: int, test_message: str) -> None:
+async def test_async_timed_decorator(capsys, caplog, iterations: int, test_message: str) -> None:
     """Tests the default behavior of @timed."""
     logger = logging.getLogger('PP_duster')
     logger.setLevel(logging.INFO)
 
     @timed
-    def a_func(repetitions: int):
+    async def a_func(repetitions: int):
         acc: int = 0
         for i in range(repetitions):
             acc = acc + i if i % 2 == 0 else acc - int(i / 2)
         logger.info(test_message)
         _logger.info(test_message)
 
-    a_func(iterations)
+    _ = await a_func(iterations)
 
     test_output = capsys.readouterr()
 
