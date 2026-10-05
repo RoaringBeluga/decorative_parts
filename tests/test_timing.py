@@ -3,9 +3,7 @@ import logging
 from typing import Any
 
 import pytest
-from _pytest.capture import CaptureFixture
 
-import decorative_parts
 from decorative_parts import timed
 
 _DEBUG = False
