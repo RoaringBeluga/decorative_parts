@@ -2,12 +2,12 @@ import functools
 import logging
 
 
-def logged(function = None, /, *, logger = logging.getLogger(__name__),
+def logged(function = None, /, *, logger: logging.Logger = logging.getLogger(__name__),
            level = logging.DEBUG,
            message_before: str = "Function: {func_name} called.\nParameters:\n{params}",
            message_after: str = "Function {func_name} ran successfully with result: {result}",
            message_error: str = "Function {func_name} raised an error: {err}",
-          **decorator_args):
+           **decorator_args):
     """Log execution start, completion and errors
         String template reference:
 
