@@ -62,7 +62,7 @@ async def test_timed_annotation_with_parameters(iterations: int, test_message: s
     collector = _DataCollector()
 
     # Use the collector's method as the logger function, passing all necessary metrics.
-    @timed(logger_func=collector.log_capture, message_template="{message}", message=test_message)
+    @timed(log_callback=collector.log_capture, message_template="{message}", message=test_message)
     async def a_func(repetitions: int):
         acc: int = 0
         for i in range(repetitions):

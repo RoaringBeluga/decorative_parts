@@ -1,9 +1,17 @@
-from decorative_parts.timed_execution import timed
+
 
 __all__ = [
     'timed',
-    'info'
+    'logged',
+    'LogCollector',
+    'SimpleLogCollector',
+    'info',
 ]
+
+from decorative_parts.log_collector import LogCollector
+from decorative_parts.logged_execution import logged
+from decorative_parts.simple_log_collector import SimpleLogCollector
+from decorative_parts.timed_execution import timed
 
 info_dump = """### Decorators:
     @timed
@@ -28,7 +36,20 @@ info_dump = """### Decorators:
     
     @logged
     Writes to logs before and after the function'[s execution and on errors
-    Takes the following keyword arguments:
+    Log execution start, completion and errors
+        logger: Logger instance, defaults to ``logging.getLogger(__name__)``
+        level: Log level, defaults to ``logging.DEBUG``
+        message_before: Log entry template for before the execution
+        message_after: Log entry template for after the execution
+        message_error: Log entry template for errors (log level ALWAYS set to ``logging.ERROR)``
+        decorator_args: optional keyword arguments for the decorator
+            String template reference:
+                * ``{func_name}``: name of the decorated function. Built-in `funcName` is NOT correct
+                * ``{params}``: Dictionary of parameters of the decorated function:
+                - ``params['args']``: list of positional arguments
+                - ``params['kwargs']``: dictionary of keyword arguments
+                * ``{result}``: Function execution result
+                * ``{err}``: Error raised during execution
     """
 
 

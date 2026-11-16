@@ -28,10 +28,12 @@ The `@timed` decorator wraps a function to automatically log its runtime in nano
 *   `:param decorator_args`: Additional keyword arguments passed to the logging callback.
 
 **Example:**
+
 ```python
 from decorative_parts.timed_execution import timed
 
-@timed(logger_func=print, message_template="Function: {func_name} ran in {diff} ns") # Custom logger and template
+
+@timed(log_callback=print, message_template="Function: {func_name} ran in {diff} ns")  # Custom logger and template
 def complex_calculation():
     # Simulate some work that takes time
     pass
