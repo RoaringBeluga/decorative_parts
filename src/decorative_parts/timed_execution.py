@@ -4,6 +4,8 @@ import inspect
 from time import perf_counter_ns
 from typing import Any, Callable
 
+from decorative_parts import LogCollector
+
 
 def _printout(**kwargs) -> None:
     """Default logging function. Prints the message to the stdout, formatting it."""
@@ -11,16 +13,20 @@ def _printout(**kwargs) -> None:
     print(message.format(**kwargs))
 
 
-def timed(function=None, /, *, logger_func: Callable[..., Any] = _printout,
+def timed(function=None, /, *, log_callback: LogCollector | Callable[..., Any] = _printout,
           message_template: str = "Function: {func_name} runtime {diff} nanoseconds",
           **decorator_args) -> Callable[..., Callable[..., Any]]:
     """Timed execution decorator
 
-    :param logger_func: logging callback function
+    :param log_callback: logging callback function
     :param message_template: message template to be passed to the callback
     :param decorator_args: additional arguments to be passed to the callback function
     :return: decorated function
     """
+    if isinstance(log_callback, LogCollector):
+        _logger = log_callback.collect
+    else:
+        _logger = log_callback
 
     def outer(func):
         @functools.wraps(func)
@@ -30,8 +36,8 @@ def timed(function=None, /, *, logger_func: Callable[..., Any] = _printout,
             res = await func(*args, **kwargs)
             end = perf_counter_ns()
             diff = end - start
-            logger_func(msg=message_template, func_name=func_name, start=start, end=end, diff=diff,
-                        extra=decorator_args)
+            _logger(msg=message_template, func_name=func_name, start=start, end=end, diff=diff,
+                         extra=decorator_args)
             return res
 
         @functools.wraps(func)
@@ -41,8 +47,8 @@ def timed(function=None, /, *, logger_func: Callable[..., Any] = _printout,
             res = func(*args, **kwargs)
             end = perf_counter_ns()
             diff = end - start
-            logger_func(msg=message_template, func_name=func_name, start=start, end=end, diff=diff,
-                        extra=decorator_args)
+            _logger(msg=message_template, func_name=func_name, start=start, end=end, diff=diff,
+                         extra=decorator_args)
             return res
 
         if inspect.iscoroutinefunction(func):
