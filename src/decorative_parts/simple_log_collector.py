@@ -1,5 +1,4 @@
-from datetime import datetime, tzinfo
-from typing import Any
+from datetime import datetime
 
 
 class SimpleLogCollector:

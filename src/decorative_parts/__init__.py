@@ -1,11 +1,11 @@
 
 
 __all__ = [
-    'timed',
-    'logged',
     'LogCollector',
     'SimpleLogCollector',
     'info',
+    'logged',
+    'timed',
 ]
 
 from decorative_parts.log_collector import LogCollector

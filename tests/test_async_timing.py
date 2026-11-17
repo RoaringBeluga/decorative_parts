@@ -50,7 +50,6 @@ class _DataCollector:
     @property
     def diff_str(self) -> str:
         nanos_s = self.seconds * 1_000_000_000
-        nanos_ms = self.milliseconds * 1_000_000
         return f"{nanos_s}.{self.diff - nanos_s}s"
 
 

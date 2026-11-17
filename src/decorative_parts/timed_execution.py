@@ -1,8 +1,9 @@
 """Decorator for timing execution of functions"""
 import functools
 import inspect
+from collections.abc import Callable
 from time import perf_counter_ns
-from typing import Any, Callable
+from typing import Any
 
 from decorative_parts import LogCollector
 

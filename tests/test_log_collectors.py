@@ -2,7 +2,7 @@ import random
 
 import pytest
 
-from decorative_parts import timed, SimpleLogCollector
+from decorative_parts import SimpleLogCollector, timed
 
 _nums = {
     '01': random.randrange(1_000_000_000),
@@ -36,7 +36,7 @@ def test_log_collector_protocol(a_position: str, a_num: int) -> None:
 
     @timed(log_callback=collector, message_template="An Message", a_dog='A Pug!', a_cat='Manul',)
     def looper(rnd: int=1_000_000) -> None:
-        for _ in range(0, rnd):
+        for _ in range(rnd):
             pass
 
     looper(a_num)
@@ -51,7 +51,7 @@ def test_simple_log_collector(a_position: str, a_num: int) -> None:
 
     @timed(log_callback=collector, message_template="An Message", a_dog='A Pug!', a_cat='Manul',)
     def looper(rnd: int=1_000_000) -> None:
-        for _ in range(0, rnd):
+        for _ in range(rnd):
             pass
 
     looper(a_num)

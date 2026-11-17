@@ -2,7 +2,7 @@ import functools
 import logging
 
 
-def logged(function = None, /, *, logger: logging.Logger = logging.getLogger(__name__),
+def logged(function = None, /, *, logger: logging.Logger | None = None,
            level = logging.DEBUG,
            message_before: str = "Function: {func_name} called.\nParameters:\n{params}",
            message_after: str = "Function {func_name} ran successfully with result: {result}",
@@ -24,6 +24,11 @@ def logged(function = None, /, *, logger: logging.Logger = logging.getLogger(__n
     :param message_error: Log entry template for errors (log level ALWAYS set to ``logging.ERROR)``
     :param decorator_args: optional keyword arguments for the decorator
     """
+    if logger is None:
+        active_logger = logging.getLogger(f'{__name__}-logged-{logging.getLevelName(level)}')
+    else:
+        active_logger = logger
+
     def outer(func):
         @functools.wraps(func)
         def inside(*args, **kwargs):
@@ -35,14 +40,14 @@ def logged(function = None, /, *, logger: logging.Logger = logging.getLogger(__n
                     'kwargs': kwargs,
                 },
             }
-            logger.log(level = level,msg=message_before.format(**extra), extra=extra)
+            active_logger.log(level = level,msg=message_before.format(**extra), extra=extra)
             try:
                 res = func(*args, **kwargs)
                 extra['result'] = res
-                logger.log(level = level,msg=message_after.format(**extra), extra=extra)
+                active_logger.log(level = level,msg=message_after.format(**extra), extra=extra)
             except Exception as err:
                 extra['err'] = err
-                logger.log(level = logging.ERROR,msg=message_error.format(**extra), extra=extra)
+                active_logger.log(level = logging.ERROR,msg=message_error.format(**extra), extra=extra)
                 raise
             else:
                 return res
@@ -59,15 +64,16 @@ def logger(func):
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        logger = logging.getLogger(func.__name__)
         """
         The wrapper function that logs function calls and their results.
         """
-        logging.info(f"Running {func.__name__} with args: {args}, kwargs: {kwargs}")
+        logger.info(f"Running {func.__name__} with args: {args}, kwargs: {kwargs}")
         try:
             result = func(*args, **kwargs)
-            logging.info(f"Finished {func.__name__} with result: {result}")
+            logger.info(f"Finished {func.__name__} with result: {result}")
         except Exception as e:
-            logging.error(f"Error occurred in {func.__name__}: {e}")
+            logger.error(f"Error occurred in {func.__name__}: {e}")
             raise
         else:
             return result
